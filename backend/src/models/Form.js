@@ -1,36 +1,16 @@
-const { DataTypes } = require('sequelize');
+const mongoose = require('mongoose');
 
-module.exports = (sequelize) => {
-    const Form = sequelize.define('Form', {
-        id: {
-            type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
-            primaryKey: true
-        },
-        title: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        description: DataTypes.TEXT,
-        shareCode: {
-            type: DataTypes.STRING,
-            unique: true,
-            allowNull: false
-        },
-        fields: {
-            type: DataTypes.JSONB,
-            allowNull: false,
-            defaultValue: []
-        },
-        isActive: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: true
-        },
-        createdBy: {
-            type: DataTypes.UUID,
-            allowNull: false
-        }
-    });
+const FieldSchema = new mongoose.Schema({
+  label: String,
+  type: { type: String, enum: ['text', 'number', 'dropdown'], required: true },
+  options: [String] // for dropdown
+});
 
-    return Form;
-};
+const FormSchema = new mongoose.Schema({
+  title: String,
+  fields: [FieldSchema],
+  formCode: { type: String, unique: true },
+  response: Object // shared response { fieldId: value }
+});
+
+module.exports = mongoose.model('Form', FormSchema);
